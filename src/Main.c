@@ -497,7 +497,7 @@ void Update(AglWindow* w){
 		Vec3 c = (Vec3){ vCamera.x,vCamera.y,vCamera.z };
 		RayCast_TileMap_N(&map,(void*)World_Void,c,(Vec3){ vLookDir.x,vLookDir.y,vLookDir.z },0.01f,4.0f,&c);
 		
-		vec3d pos = { vLength.x * 0.5f,vLength.y * 0.9f,vLength.z * 0.5f };
+		vec3d pos = { -vLength.x * 0.5f,vLength.y * 0.6f,-vLength.z * 0.5f };
 		Rect3 pr = { { c.x,c.y,c.z },{ 1.0f,1.0f,1.0f } };
 		Rect3 br = { vec3d_Sub(vCamera,pos),vLength };
 		if(!Rect3_Overlap(pr,br)){
