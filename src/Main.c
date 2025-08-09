@@ -435,7 +435,7 @@ void Update(AglWindow* w){
 		fYaw += 2.0f * w->w.ElapsedTime;
 
 	if(Stroke(ALX_KEY_Z).PRESSED)
-		Mode = Mode < 3 ? Mode+1 : 0;
+		Mode = Mode < 2 ? Mode+1 : 0;
 
 	if(Stroke(ALX_KEY_R).DOWN)
 		if(OnGround) 
@@ -494,7 +494,7 @@ void Update(AglWindow* w){
 		//World_Edit(&map,&meshSelected->tris,(vec3d){ c.x,c.y,c.z },BLOCK_VOID);
 	}
 	if(Stroke(ALX_MOUSE_R).PRESSED){
-		Vec3 c = (Vec3){ vCamera.x,vCamera.y,vCamera.z };
+		Vec3 c = (Vec3){ vCamera.x,vCamera.y + vLength.y * 0.6f,vCamera.z };
 		RayCast_TileMap_N(&map,(void*)World_Void,c,(Vec3){ vLookDir.x,vLookDir.y,vLookDir.z },0.01f,4.0f,&c);
 		
 		vec3d pos = { -vLength.x * 0.5f,vLength.y * 0.6f,-vLength.z * 0.5f };
@@ -507,7 +507,7 @@ void Update(AglWindow* w){
 		}
 	}
 	
-	if(Mode==0){
+	if(Mode==1){
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }else{
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
