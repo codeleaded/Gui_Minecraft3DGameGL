@@ -3,6 +3,20 @@
 
 #include "/home/codeleaded/System/Static/Container/Vector.h"
 
+typedef struct vec2d{
+	float u;
+	float v;
+	float w;
+} vec2d;
+
+vec2d vec2d_New(){
+    return (vec2d){ 0.0f,0.0f,1.0f };
+}
+vec2d vec2d_Make(float u,float v){
+    return (vec2d){ u,v,1.0f };
+}
+
+
 typedef struct vec3d{
 	float x;
 	float y;
@@ -81,12 +95,12 @@ void Triangle_CalcNorm(triangle* t){
 	t->n = vec3d_Normalise(normal);
 }
 
-#define CUBE_SIDE_SOUTH		0
-#define CUBE_SIDE_EAST		1
-#define CUBE_SIDE_NORTH		2
-#define CUBE_SIDE_WEST		3
-#define CUBE_SIDE_TOP		4
-#define CUBE_SIDE_BOTTOM	5
+#define CUBE_SIDE_SOUTH      0
+#define CUBE_SIDE_WEST       1
+#define CUBE_SIDE_NORTH      2
+#define CUBE_SIDE_EAST       3
+#define CUBE_SIDE_TOP        4
+#define CUBE_SIDE_BOTTOM     5
 
 #define CUBE_SIDE_000		0
 #define CUBE_SIDE_001		1
@@ -118,12 +132,12 @@ void Triangle_CalcNorm(triangle* t){
 
 vec3d Neighbour_Side(int s){
 	switch (s){
-	case CUBE_SIDE_SOUTH: 	return (vec3d){ 0.0f, 0.0f,-1.0f,1.0f };
-	case CUBE_SIDE_EAST: 	return (vec3d){ 1.0f, 0.0f, 0.0f,1.0f };
-	case CUBE_SIDE_NORTH: 	return (vec3d){ 0.0f, 0.0f, 1.0f,1.0f };
-	case CUBE_SIDE_WEST: 	return (vec3d){-1.0f, 0.0f, 0.0f,1.0f };
-	case CUBE_SIDE_TOP: 		return (vec3d){ 0.0f, 1.0f, 0.0f,1.0f };
-	case CUBE_SIDE_BOTTOM: 	return (vec3d){ 0.0f,-1.0f, 0.0f,1.0f };
+		case CUBE_SIDE_NORTH: 	return (vec3d){ 0.0f, 0.0f,-1.0f,1.0f };
+		case CUBE_SIDE_EAST: 	return (vec3d){ 1.0f, 0.0f, 0.0f,1.0f };
+		case CUBE_SIDE_SOUTH: 	return (vec3d){ 0.0f, 0.0f, 1.0f,1.0f };
+		case CUBE_SIDE_WEST: 	return (vec3d){-1.0f, 0.0f, 0.0f,1.0f };
+		case CUBE_SIDE_TOP: 	return (vec3d){ 0.0f, 1.0f, 0.0f,1.0f };
+		case CUBE_SIDE_BOTTOM: 	return (vec3d){ 0.0f,-1.0f, 0.0f,1.0f };
 	}
 	return (vec3d){ 0.0f,0.0f,0.0f,1.0f };
 }

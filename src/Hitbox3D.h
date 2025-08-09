@@ -18,7 +18,7 @@ void Rect3_Static(Rect3* r1,Rect3 r2,void* Data,void (**Funcs)(void*)){
 
         vec3d l = vec3d_Add(r1->d,r2.d);
         vec3d d = vec3d_Sub(m2,m1);
-        d = vec3d_new(d.x / l.x,d.y / l.y,d.z / l.z);
+        d = (vec3d){ d.x / l.x,d.y / l.y,d.z / l.z,1.0f };
 
         if(F32_Abs(d.x)>F32_Abs(d.y)){
             if(F32_Abs(d.x)>F32_Abs(d.z)){

@@ -5,6 +5,14 @@
 #include "/home/codeleaded/System/Static/Library/PerlinNoise.h"
 #include "/home/codeleaded/System/Static/Library/Files.h"
 
+
+typedef struct CubeSide {
+    vec3d pos;
+	unsigned char light;
+    unsigned char id;
+    unsigned char side;
+} CubeSide;
+
 typedef unsigned char Light;
 #define LIGHT_MIN	0
 #define LIGHT_MAX	15
@@ -29,13 +37,34 @@ typedef unsigned char Block;
 
 #define BLOCK_ERROR	255
 
-#define BLOCK_VOID	0
-#define BLOCK_DIRT	1
-#define BLOCK_STONE	2
-#define BLOCK_GRAS	3
-#define BLOCK_LEAF	4
-#define BLOCK_LOG	5
-#define BLOCK_TORCH	6
+#define BLOCK_VOID			0
+#define BLOCK_DIRT			1
+#define BLOCK_GRAS			3
+#define BLOCK_STONE			4
+#define BLOCK_SAND			5
+#define BLOCK_WATER			6
+#define BLOCK_LOG			7
+#define BLOCK_LEAF			8
+#define BLOCK_TORCH			9
+
+
+const int ATLAS_COLS = 16;
+const int ATLAS_ROWS = 16;
+const float TILE_WIDTH = 1.0f / (float)ATLAS_COLS;
+const float TILE_HEIGHT = 1.0f / (float)ATLAS_ROWS;
+
+#define BLOCK_FACE_VOID		0
+#define BLOCK_FACE_DIRT		(ATLAS_COLS * 15 + 2)
+#define BLOCK_FACE_GRAS		(ATLAS_COLS * 15 + 3)
+#define BLOCK_FACE_GRAST	(ATLAS_COLS * 15 + 0)
+#define BLOCK_FACE_STONE	(ATLAS_COLS * 15 + 1)
+#define BLOCK_FACE_SAND		(ATLAS_COLS * 8 + 14)
+#define BLOCK_FACE_WATER	(ATLAS_COLS * 3 + 14)
+#define BLOCK_FACE_LOG		(ATLAS_COLS * 14 + 4)
+#define BLOCK_FACE_LOGT		(ATLAS_COLS * 14 + 5)
+#define BLOCK_FACE_LEAF		(ATLAS_COLS * 12 + 5)
+#define BLOCK_FACE_TORCH	(ATLAS_COLS * 8 + 8)
+#define BLOCK_FACE_TORCHT	(ATLAS_COLS * 9 + 6)
 
 float Block_ShadeSide(int s){
 	switch(s){
@@ -50,76 +79,40 @@ float Block_ShadeSide(int s){
 }
 char Block_Solid(Block b){
 	switch (b){
-	case BLOCK_DIRT: 	return 1;
-	case BLOCK_STONE: 	return 1;
-	case BLOCK_GRAS:	return 1;
-	case BLOCK_LEAF: 	return 1;
-	case BLOCK_LOG: 	return 1;
+		case BLOCK_DIRT: 	return 1;
+		case BLOCK_GRAS:	return 1;
+		case BLOCK_SAND: 	return 1;
+		case BLOCK_WATER: 	return 1;
+		case BLOCK_LOG: 	return 1;
+		case BLOCK_LEAF: 	return 1;
+		case BLOCK_TORCH: 	return 1;
 	}
 	return 0;
 }
-Pixel Block_Pixel(Block b,int s){
+unsigned char Block_Id(Block b,Side s){
 	switch (b){
-	case BLOCK_VOID: 	return BLACK;
-	case BLOCK_DIRT: 	return BROWN;
-	case BLOCK_STONE: 	return GRAY;
-	case BLOCK_GRAS:	return s==CUBE_SIDE_TOP ? GREEN : BROWN;
-	case BLOCK_LEAF: 	return DARK_GREEN;
-	case BLOCK_LOG: 	return DARK_BROWN;
-	case BLOCK_TORCH: 	return LIGHT_YELLOW;
+		case BLOCK_DIRT: 			return BLOCK_FACE_DIRT;
+		case BLOCK_GRAS:{
+			if(s==CUBE_SIDE_TOP) 	return BLOCK_FACE_GRAST;
+			if(s==CUBE_SIDE_BOTTOM)	return BLOCK_FACE_DIRT;
+			return BLOCK_FACE_GRAS;
+		}
+		case BLOCK_STONE: 			return BLOCK_FACE_STONE;
+		case BLOCK_SAND: 			return BLOCK_FACE_SAND;
+		case BLOCK_WATER: 			return BLOCK_FACE_WATER;
+		case BLOCK_LOG:{
+			if(s==CUBE_SIDE_TOP || s==CUBE_SIDE_BOTTOM)	return BLOCK_FACE_LOGT;
+			return BLOCK_FACE_LOG;
+		}
+		case BLOCK_LEAF: 			return BLOCK_FACE_LEAF;
+		case BLOCK_TORCH:{
+			if(s==CUBE_SIDE_TOP || s==CUBE_SIDE_BOTTOM)	return BLOCK_FACE_TORCHT;
+			return BLOCK_FACE_TORCH;
+		}
 	}
-	return BLACK;
+	return BLOCK_FACE_VOID;
 }
 
-triangle PlaneTris_Side(vec3d p,vec3d d,int Tri,Pixel c1,Pixel c2){
-	triangle tris[12] = {
-	// SOUTH
-	{ 0.0f, 0.0f, 0.0f, 1.0f,    0.0f, 1.0f, 0.0f, 1.0f,    1.0f, 1.0f, 0.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c1 },
-	{ 0.0f, 0.0f, 0.0f, 1.0f,    1.0f, 1.0f, 0.0f, 1.0f,    1.0f, 0.0f, 0.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c2 },
-	// EAST                                                      
-	{ 1.0f, 0.0f, 0.0f, 1.0f,    1.0f, 1.0f, 0.0f, 1.0f,    1.0f, 1.0f, 1.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c1 },
-	{ 1.0f, 0.0f, 0.0f, 1.0f,    1.0f, 1.0f, 1.0f, 1.0f,    1.0f, 0.0f, 1.0f, 1.0f,		0.0f, 0.0f, 0.0f, 1.0f,	c2 },
-	// NORTH                                                     
-	{ 1.0f, 0.0f, 1.0f, 1.0f,    1.0f, 1.0f, 1.0f, 1.0f,    0.0f, 1.0f, 1.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c1 },
-	{ 1.0f, 0.0f, 1.0f, 1.0f,    0.0f, 1.0f, 1.0f, 1.0f,    0.0f, 0.0f, 1.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c2 },
-	// WEST                                                      
-	{ 0.0f, 0.0f, 1.0f, 1.0f,    0.0f, 1.0f, 1.0f, 1.0f,    0.0f, 1.0f, 0.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c1 },
-	{ 0.0f, 0.0f, 1.0f, 1.0f,    0.0f, 1.0f, 0.0f, 1.0f,    0.0f, 0.0f, 0.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c2 },
-	// TOP                                                       
-	{ 0.0f, 1.0f, 0.0f, 1.0f,    0.0f, 1.0f, 1.0f, 1.0f,    1.0f, 1.0f, 1.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c1 },
-	{ 0.0f, 1.0f, 0.0f, 1.0f,    1.0f, 1.0f, 1.0f, 1.0f,    1.0f, 1.0f, 0.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c2 },
-	// BOTTOM                                                    
-	{ 1.0f, 0.0f, 1.0f, 1.0f,    0.0f, 0.0f, 1.0f, 1.0f,    0.0f, 0.0f, 0.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c1 },
-	{ 1.0f, 0.0f, 1.0f, 1.0f,    0.0f, 0.0f, 0.0f, 1.0f,    1.0f, 0.0f, 0.0f, 1.0f,	    0.0f, 0.0f, 0.0f, 1.0f,	c2 },
-	};
-
-	for(int j = 0;j<3;j++){
-		tris[Tri].p[j] = vec3d_Add(p,vec3d_new(tris[Tri].p[j].x * d.x,tris[Tri].p[j].y * d.y,tris[Tri].p[j].z * d.z));
-	}
-	Triangle_CalcNorm(&tris[Tri]);
-
-	float dp = Block_ShadeSide(Tri / 2);
-	tris[Tri].c = Pixel_Mul(tris[Tri].c,Pixel_toRGBA(dp,dp,dp,1.0f));
-	
-	return tris[Tri];
-}
-void Cube_Set(triangle* trisout,vec3d p,vec3d d,Pixel c){
-	for(int i = 0;i<12;i++){
-		trisout[i] = PlaneTris_Side(p,d,i,c,c);
-	}
-}
-void MakeCube(Vector* tris,vec3d p,vec3d d,Pixel c){
-	triangle buff[12];
-	Cube_Set(buff,p,d,c);
-
-	for(int i = 0;i<12;i++){
-		Vector_Push(tris,&buff[i]);
-	}
-}
-void MakePlane(Vector* tris,vec3d p,vec3d d,int Plane,Pixel c){
-	Vector_Push(tris,(triangle[]){ PlaneTris_Side(p,d,Plane * 2,c,c) });
-	Vector_Push(tris,(triangle[]){ PlaneTris_Side(p,d,Plane * 2 + 1,c,c) });
-}
 
 #define CHUNK_LX	8
 #define CHUNK_LY	100
@@ -257,7 +250,7 @@ void Chunk_Generate(Chunk* c,int x,int z){
 
 	Chunk_SunLight(c);
 }
-void Chunk_Mesh(Chunk* c,Vector* tris,int x,int z){
+void Chunk_Mesh(Chunk* c,Vector* cubeSides,int x,int z){
 	int cx = x * CHUNK_LX;
 	int cz = z * CHUNK_LZ;
 	
@@ -265,6 +258,7 @@ void Chunk_Mesh(Chunk* c,Vector* tris,int x,int z){
         for(int j = 0;j<CHUNK_LY;j++){
 			for(int k = 0;k<CHUNK_LX;k++){
 				Block b = Chunk_Get(c,k,j,i);
+				Light l = Chunk_Get_Light(c,k,j,i);
 
 				if(b!=BLOCK_VOID){
 					for(int s = 0;s<6;s++){
@@ -272,10 +266,10 @@ void Chunk_Mesh(Chunk* c,Vector* tris,int x,int z){
 						vec3d n = vec3d_Add(p,Neighbour_Side(s));
 						
 						Block nb = Chunk_Get(c,n.x,n.y,n.z);
+						Light nl = Chunk_Get_Light(c,n.x,n.y,n.z);
 						if(nb==BLOCK_VOID || nb==BLOCK_ERROR){
-							Pixel c = Block_Pixel(b,s);
 							vec3d cp = { cx + k,j,cz + i,1.0f };
-							MakePlane(tris,cp,(vec3d){ 1.0f,1.0f,1.0f },s,c);
+							Vector_Push(cubeSides,(CubeSide[]){ { .pos = cp,.light = nl,.id = b,.side = s } });
 						}
 					}
 				}
@@ -343,8 +337,9 @@ void Row_Free(Row* r){
 	Vector_Free(r);
 }
 
-#define WORLD_DX	12
-#define WORLD_DZ	12
+
+#define WORLD_DX	18
+#define WORLD_DZ	18
 
 typedef struct World {
 	int x;
@@ -539,7 +534,7 @@ void World_Tree(World* map,int x,int y,int z){
 	World_Set(map,x,y+4,z+1,BLOCK_LEAF);
 	World_Set(map,x,y+4,z-1,BLOCK_LEAF);
 }
-void World_Chunk_Mesh(World* w,Chunk* c,Vector* tris,int x,int z){
+void World_Chunk_Mesh(World* w,Chunk* c,Vector* cubeSides,int x,int z){
 	float cx = Chunk_CtoW(x,CHUNK_LX);
 	float cz = Chunk_CtoW(z,CHUNK_LZ);
 	
@@ -557,65 +552,7 @@ void World_Chunk_Mesh(World* w,Chunk* c,Vector* tris,int x,int z){
 						Light nl = World_Get_Light(w,n.x,n.y,n.z);
 
 						if(nb==BLOCK_VOID){
-							triangle tri1 = PlaneTris_Side(p,(vec3d){ 1.0f,1.0f,1.0f,1.0f },s * 2,WHITE,WHITE);
-							triangle tri2 = PlaneTris_Side(p,(vec3d){ 1.0f,1.0f,1.0f,1.0f },s * 2 + 1,WHITE,WHITE);
-
-							Light light1 = nl;
-							Light light2 = nl;
-
-							vec3d avg1 = vec3d_Div(vec3d_Add(vec3d_Add(tri1.p[0],tri1.p[1]),tri1.p[2]),3.0f);
-							vec3d avg2 = vec3d_Div(vec3d_Add(vec3d_Add(tri1.p[0],tri1.p[1]),tri1.p[2]),3.0f);
-							
-							vec3d r1 = vec3d_Round(avg1);
-							vec3d r2 = vec3d_Round(avg2);
-							Block block1 = World_Get(w,r1.x,r1.y,r1.z);
-							Block block2 = World_Get(w,r2.x,r2.y,r2.z);
-							//if(block1==BLOCK_VOID) 
-								light1 = (light1 + World_Get_Light(w,r1.x,r1.y,r1.z)) / 2;
-							//if(block2==BLOCK_VOID)
-								light2 = (light2 + World_Get_Light(w,r2.x,r2.y,r2.z)) / 2;
-
-							int count1 = 1;
-							int count2 = 1;
-
-							//int sides1[] = { CUBE_SIDE_NORTH,CUBE_SIDE_EAST,CUBE_SIDE_BOTTOM };
-							//int sides2[] = { CUBE_SIDE_SOUTH,CUBE_SIDE_WEST,CUBE_SIDE_TOP };
-							for(int ns = 0;ns<6;ns++){
-								if(ns!=Side_Other(s)){
-									vec3d nn1 = vec3d_Add(avg1,Neighbour_Side(ns));
-									vec3d nn2 = vec3d_Add(avg2,Neighbour_Side(ns));
-
-									Block nnb1 = World_Get(w,nn1.x,nn1.y,nn1.z);
-									Block nnb2 = World_Get(w,nn2.x,nn2.y,nn2.z);
-
-									Light nnl1 = World_Get_Light(w,nn1.x,nn1.y,nn1.z);
-									Light nnl2 = World_Get_Light(w,nn2.x,nn2.y,nn2.z);
-									
-									if(nnb1==BLOCK_VOID){
-										light1 += nnl1;
-										count1++;
-									}
-									if(nnb2==BLOCK_VOID){
-										light2 += nnl2;
-										count2++;
-									}
-								}
-							}
-
-							light1 /= count1;
-							light2 /= count2;
-
-							float l1 = (float)(light1) / (float)LIGHT_MAX * Block_ShadeSide(s);
-							float l2 = (float)(light2) / (float)LIGHT_MAX * Block_ShadeSide(s);
-							Pixel c1 = Pixel_Mul(Block_Pixel(b,s),Pixel_toRGBA(l1,l1,l1,1.0f));
-							Pixel c2 = Pixel_Mul(Block_Pixel(b,s),Pixel_toRGBA(l2,l2,l2,1.0f));
-							tri1.c = c1;
-							tri2.c = c2;
-							
-							Vector_Push(tris,&tri1);
-							Vector_Push(tris,&tri2);
-
-							//MakePlane(tris,p,(vec3d){ 1.0f,1.0f,1.0f },s,c);
+							Vector_Push(cubeSides,(CubeSide[]){ { .pos = p,.light = nl,.id = b,.side = s } });
 						}
 					}
 				}
@@ -623,9 +560,9 @@ void World_Chunk_Mesh(World* w,Chunk* c,Vector* tris,int x,int z){
 		}
     }
 }
-void World_Mesh(World* w,Vector* tris){
+void World_Mesh(World* w,Vector* cubeSides){
 	World_Light(w);
-	Vector_Clear(tris);
+	Vector_Clear(cubeSides);
 
 	for(int i = 0;i<w->rows.size;i++){
         Row* r = (Row*)Vector_Get(&w->rows,i);
@@ -633,11 +570,11 @@ void World_Mesh(World* w,Vector* tris){
 			Chunk* c = (Chunk*)Vector_Get(r,j);
 			int x = w->x + j;
 			int z = w->z + i;
-			World_Chunk_Mesh(w,c,tris,x,z);
+			World_Chunk_Mesh(w,c,cubeSides,x,z);
 		}
     }
 }
-char World_Update(World* map,Vector* tris,char* path,float x,float z){
+char World_Update(World* map,Vector* cubeSides,char* path,float x,float z){
 	int cx = Chunk_WtoC(x,CHUNK_LX) - WORLD_DX / 2;
 	int cz = Chunk_WtoC(z,CHUNK_LZ) - WORLD_DZ / 2;
 
@@ -692,7 +629,7 @@ char World_Update(World* map,Vector* tris,char* path,float x,float z){
 		map->x = cx;
 		map->z = cz;
 
-		World_Mesh(map,tris);
+		World_Mesh(map,cubeSides);
 		return 1;
 	}
 	return 0;
@@ -705,9 +642,9 @@ void World_Generate(World* map){
 		Vector_Push(&map->rows,&r);
     }
 }
-void World_Edit(World* map,Vector* tris,vec3d p,Block b){
+void World_Edit(World* map,Vector* cubeSides,vec3d p,Block b){
 	World_Set(map,p.x,p.y,p.z,b);
-	World_Mesh(map,tris);
+	World_Mesh(map,cubeSides);
 }
 void World_Free(World* w){
 	for(int i = 0;i<w->rows.size;i++){
