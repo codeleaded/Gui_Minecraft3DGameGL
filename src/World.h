@@ -304,6 +304,7 @@ void Chunk_Save(Chunk* c,char* path,int x,int z){
 	CStr_Free(&fullpath);
 }
 
+
 typedef Vector Row;
 
 Row Row_New(){
@@ -338,8 +339,8 @@ void Row_Free(Row* r){
 }
 
 
-#define WORLD_DX	18
-#define WORLD_DZ	18
+#define WORLD_DX	8
+#define WORLD_DZ	8
 
 typedef struct World {
 	int x;

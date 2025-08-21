@@ -224,7 +224,7 @@ void Camera_Move(float Time){
 	vVelocity.x = v.x;
 	vVelocity.z = v.y;
 
-	vVelocity = vec3d_Add(vVelocity,vec3d_Mul((vec3d){ 0.0f,-10.0f,0.0f,1.0f },Time));
+	vVelocity = vec3d_Add(vVelocity,vec3d_Mul((vec3d){ 0.0f,0.0f,0.0f,1.0f },Time));
 	vCamera = vec3d_Add(vCamera,vec3d_Mul(vVelocity,Time));
 }
 void Camera_Collision(){
@@ -338,7 +338,7 @@ void GL_Init(){
 
     stbi_set_flip_vertically_on_load(1);
     int width,height,n;
-    unsigned char* data = stbi_load("./data/Std_Atlas.png", &width, &height, &n, 0);
+    unsigned char* data = stbi_load("./assets/Old_Atlas.png", &width, &height, &n, 0);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, (n==3 ? GL_RGB : GL_RGBA), GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
@@ -438,14 +438,14 @@ void Update(AglWindow* w){
 		Mode = Mode < 2 ? Mode+1 : 0;
 
 	if(Stroke(ALX_KEY_R).DOWN)
-		if(OnGround) 
+		//if(OnGround) 
 			vVelocity.y = 5.0f;
 	
-	//if(Stroke(ALX_KEY_F).DOWN)
-	//	vVelocity.y = -5.0f;
+	if(Stroke(ALX_KEY_F).DOWN)
+		vVelocity.y = -5.0f;
 
-	//if(Stroke(ALX_KEY_R).RELEASED || Stroke(ALX_KEY_F).RELEASED)
-	//	vVelocity.y = 0.0f;
+	if(Stroke(ALX_KEY_R).RELEASED || Stroke(ALX_KEY_F).RELEASED)
+		vVelocity.y = 0.0f;
 
 	mat4x4 matCameraRot = Matrix_MakeRotationY(fYaw);
 	vec3d vForward = Matrix_MultiplyVector(matCameraRot,vec3d_new(0.0f,0.0f,1.0f));
@@ -501,7 +501,7 @@ void Update(AglWindow* w){
 		Rect3 pr = { { c.x,c.y,c.z },{ 1.0f,1.0f,1.0f } };
 		Rect3 br = { vec3d_Sub(vCamera,pos),vLength };
 		if(!Rect3_Overlap(pr,br)){
-			World_Set(&map,c.x,c.y,c.z,BLOCK_TORCH);
+			World_Set(&map,c.x,c.y,c.z,BLOCK_WATER);
 			updated = 1;
 			//World_Edit(&map,&meshSelected->tris,(vec3d){ c.x,c.y,c.z },BLOCK_TORCH);
 		}
