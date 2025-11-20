@@ -3,96 +3,96 @@
 
 #include "/home/codeleaded/System/Static/Container/Vector.h"
 
-typedef struct vec2d{
+typedef struct Vec2D{
 	float u;
 	float v;
 	float w;
-} vec2d;
+} Vec2D;
 
-vec2d vec2d_New(){
-    return (vec2d){ 0.0f,0.0f,1.0f };
+Vec2D Vec2D_New(){
+    return (Vec2D){ 0.0f,0.0f,1.0f };
 }
-vec2d vec2d_Make(float u,float v){
-    return (vec2d){ u,v,1.0f };
+Vec2D Vec2D_Make(float u,float v){
+    return (Vec2D){ u,v,1.0f };
 }
 
 
-typedef struct vec3d{
+typedef struct Vec3D{
 	float x;
 	float y;
 	float z;
 	float w;
-} vec3d;
+} Vec3D;
 
-vec3d vec3d_new(float x,float y,float z){
-	return (vec3d){ x,y,z,1.0f };
+Vec3D Vec3D_new(float x,float y,float z){
+	return (Vec3D){ x,y,z,1.0f };
 }
-vec3d vec3d_Add(vec3d v1, vec3d v2)
+Vec3D Vec3D_Add(Vec3D v1, Vec3D v2)
 {
-	return vec3d_new( v1.x + v2.x, v1.y + v2.y, v1.z + v2.z );
+	return Vec3D_new( v1.x + v2.x, v1.y + v2.y, v1.z + v2.z );
 }
-vec3d vec3d_Sub(vec3d v1, vec3d v2)
+Vec3D Vec3D_Sub(Vec3D v1, Vec3D v2)
 {
-	return vec3d_new( v1.x - v2.x, v1.y - v2.y, v1.z - v2.z );
+	return Vec3D_new( v1.x - v2.x, v1.y - v2.y, v1.z - v2.z );
 }
-vec3d vec3d_Mul(vec3d v1, float k)
+Vec3D Vec3D_Mul(Vec3D v1, float k)
 {
-	return vec3d_new( v1.x * k, v1.y * k, v1.z * k );
+	return Vec3D_new( v1.x * k, v1.y * k, v1.z * k );
 }
-vec3d vec3d_Div(vec3d v1, float k)
+Vec3D Vec3D_Div(Vec3D v1, float k)
 {
-	if(k==0.0f) return vec3d_new( 0.0f,0.0f,0.0f );
-	return vec3d_new( v1.x / k, v1.y / k, v1.z / k );
+	if(k==0.0f) return Vec3D_new( 0.0f,0.0f,0.0f );
+	return Vec3D_new( v1.x / k, v1.y / k, v1.z / k );
 }
-float vec3d_DotProduct(vec3d v1, vec3d v2)
+float Vec3D_DotProduct(Vec3D v1, Vec3D v2)
 {
 	return v1.x*v2.x + v1.y*v2.y + v1.z * v2.z;
 }
-float vec3d_Length(vec3d v)
+float Vec3D_Length(Vec3D v)
 {
-	return sqrtf(vec3d_DotProduct(v, v));
+	return sqrtf(Vec3D_DotProduct(v, v));
 }
-vec3d vec3d_Normalise(vec3d v){
-	float l = vec3d_Length(v);
-	return vec3d_new( v.x / l, v.y / l, v.z / l );
+Vec3D Vec3D_Normalise(Vec3D v){
+	float l = Vec3D_Length(v);
+	return Vec3D_new( v.x / l, v.y / l, v.z / l );
 }
-vec3d vec3d_Perp(vec3d v){
-	return vec3d_new( -v.z, v.y, v.x );
+Vec3D Vec3D_Perp(Vec3D v){
+	return Vec3D_new( -v.z, v.y, v.x );
 }
-vec3d vec3d_Round(vec3d v){
-	return vec3d_new( roundf(v.x),roundf(v.y),roundf(v.z) );
+Vec3D Vec3D_Round(Vec3D v){
+	return Vec3D_new( roundf(v.x),roundf(v.y),roundf(v.z) );
 }
 
-vec3d vec3d_CrossProduct(vec3d v1, vec3d v2){
-	vec3d v = vec3d_new(0.0f,0.0f,0.0f);
+Vec3D Vec3D_CrossProduct(Vec3D v1, Vec3D v2){
+	Vec3D v = Vec3D_new(0.0f,0.0f,0.0f);
 	v.x = v1.y * v2.z - v1.z * v2.y;
 	v.y = v1.z * v2.x - v1.x * v2.z;
 	v.z = v1.x * v2.y - v1.y * v2.x;
 	return v;
 }
-vec3d vec3d_IntersectPlane(vec3d plane_p, vec3d* plane_n, vec3d lineStart, vec3d lineEnd){
-	*plane_n = vec3d_Normalise(*plane_n);
-	float plane_d = -vec3d_DotProduct(*plane_n, plane_p);
-	float ad = vec3d_DotProduct(lineStart, *plane_n);
-	float bd = vec3d_DotProduct(lineEnd, *plane_n);
+Vec3D Vec3D_IntersectPlane(Vec3D plane_p, Vec3D* plane_n, Vec3D lineStart, Vec3D lineEnd){
+	*plane_n = Vec3D_Normalise(*plane_n);
+	float plane_d = -Vec3D_DotProduct(*plane_n, plane_p);
+	float ad = Vec3D_DotProduct(lineStart, *plane_n);
+	float bd = Vec3D_DotProduct(lineEnd, *plane_n);
 	float t = (-plane_d - ad) / (bd - ad);
-	vec3d lineStartToEnd = vec3d_Sub(lineEnd, lineStart);
-	vec3d lineToIntersect = vec3d_Mul(lineStartToEnd, t);
-	return vec3d_Add(lineStart, lineToIntersect);
+	Vec3D lineStartToEnd = Vec3D_Sub(lineEnd, lineStart);
+	Vec3D lineToIntersect = Vec3D_Mul(lineStartToEnd, t);
+	return Vec3D_Add(lineStart, lineToIntersect);
 }
 
-typedef struct triangle{
-	vec3d p[3];
-	vec3d n;
+typedef struct Tri3D{
+	Vec3D p[3];
+	Vec3D n;
 	unsigned int c;
-} triangle;
+} Tri3D;
 
-void Triangle_CalcNorm(triangle* t){
-	vec3d line1 = vec3d_Sub(t->p[1],t->p[0]);
-	vec3d line2 = vec3d_Sub(t->p[2],t->p[0]);
-	vec3d normal = vec3d_CrossProduct(line1,line2);
+void Triangle_CalcNorm(Tri3D* t){
+	Vec3D line1 = Vec3D_Sub(t->p[1],t->p[0]);
+	Vec3D line2 = Vec3D_Sub(t->p[2],t->p[0]);
+	Vec3D normal = Vec3D_CrossProduct(line1,line2);
 
-	t->n = vec3d_Normalise(normal);
+	t->n = Vec3D_Normalise(normal);
 }
 
 #define CUBE_SIDE_SOUTH      0
@@ -130,16 +130,16 @@ void Triangle_CalcNorm(triangle* t){
 #define CUBE_SIDE_221		25
 #define CUBE_SIDE_222		26
 
-vec3d Neighbour_Side(int s){
+Vec3D Neighbour_Side(int s){
 	switch (s){
-		case CUBE_SIDE_NORTH: 	return (vec3d){ 0.0f, 0.0f,-1.0f,1.0f };
-		case CUBE_SIDE_EAST: 	return (vec3d){ 1.0f, 0.0f, 0.0f,1.0f };
-		case CUBE_SIDE_SOUTH: 	return (vec3d){ 0.0f, 0.0f, 1.0f,1.0f };
-		case CUBE_SIDE_WEST: 	return (vec3d){-1.0f, 0.0f, 0.0f,1.0f };
-		case CUBE_SIDE_TOP: 	return (vec3d){ 0.0f, 1.0f, 0.0f,1.0f };
-		case CUBE_SIDE_BOTTOM: 	return (vec3d){ 0.0f,-1.0f, 0.0f,1.0f };
+		case CUBE_SIDE_NORTH: 	return (Vec3D){ 0.0f, 0.0f,-1.0f,1.0f };
+		case CUBE_SIDE_EAST: 	return (Vec3D){ 1.0f, 0.0f, 0.0f,1.0f };
+		case CUBE_SIDE_SOUTH: 	return (Vec3D){ 0.0f, 0.0f, 1.0f,1.0f };
+		case CUBE_SIDE_WEST: 	return (Vec3D){-1.0f, 0.0f, 0.0f,1.0f };
+		case CUBE_SIDE_TOP: 	return (Vec3D){ 0.0f, 1.0f, 0.0f,1.0f };
+		case CUBE_SIDE_BOTTOM: 	return (Vec3D){ 0.0f,-1.0f, 0.0f,1.0f };
 	}
-	return (vec3d){ 0.0f,0.0f,0.0f,1.0f };
+	return (Vec3D){ 0.0f,0.0f,0.0f,1.0f };
 }
 int Side_Other(int s){
 	switch (s){
@@ -152,77 +152,77 @@ int Side_Other(int s){
 	}
 	return CUBE_SIDE_SOUTH;
 }
-vec3d Neighbour_AllSide(int s){
+Vec3D Neighbour_AllSide(int s){
 	switch (s){
-		case CUBE_SIDE_000: return (vec3d){-1.0f,-1.0f,-1.0f,1.0f };
-		case CUBE_SIDE_001: return (vec3d){-1.0f,-1.0f, 0.0f,1.0f };
-		case CUBE_SIDE_100: return (vec3d){ 0.0f,-1.0f,-1.0f,1.0f };
-		case CUBE_SIDE_101: return (vec3d){ 0.0f,-1.0f, 0.0f,1.0f };
-		case CUBE_SIDE_002: return (vec3d){-1.0f,-1.0f, 1.0f,1.0f };
-		case CUBE_SIDE_102: return (vec3d){ 0.0f,-1.0f, 1.0f,1.0f };
-		case CUBE_SIDE_200: return (vec3d){ 1.0f,-1.0f,-1.0f,1.0f };
-		case CUBE_SIDE_201: return (vec3d){ 1.0f,-1.0f, 0.0f,1.0f };
-		case CUBE_SIDE_202: return (vec3d){ 1.0f,-1.0f, 1.0f,1.0f };
-		case CUBE_SIDE_010: return (vec3d){-1.0f, 0.0f,-1.0f,1.0f };
-		case CUBE_SIDE_011: return (vec3d){-1.0f, 0.0f, 0.0f,1.0f };
-		case CUBE_SIDE_110: return (vec3d){ 0.0f, 0.0f,-1.0f,1.0f };
-		case CUBE_SIDE_111: return (vec3d){ 0.0f, 0.0f, 0.0f,1.0f };
-		case CUBE_SIDE_012: return (vec3d){-1.0f, 0.0f, 1.0f,1.0f };
-		case CUBE_SIDE_112: return (vec3d){ 0.0f, 0.0f, 1.0f,1.0f };
-		case CUBE_SIDE_210: return (vec3d){ 1.0f, 0.0f,-1.0f,1.0f };
-		case CUBE_SIDE_211: return (vec3d){ 1.0f, 0.0f, 0.0f,1.0f };
-		case CUBE_SIDE_212: return (vec3d){ 1.0f, 0.0f, 1.0f,1.0f };
-		case CUBE_SIDE_020: return (vec3d){-1.0f, 1.0f,-1.0f,1.0f };
-		case CUBE_SIDE_021: return (vec3d){-1.0f, 1.0f, 0.0f,1.0f };
-		case CUBE_SIDE_120: return (vec3d){ 0.0f, 1.0f,-1.0f,1.0f };
-		case CUBE_SIDE_121: return (vec3d){ 0.0f, 1.0f, 0.0f,1.0f };
-		case CUBE_SIDE_022: return (vec3d){-1.0f, 1.0f, 1.0f,1.0f };
-		case CUBE_SIDE_122: return (vec3d){ 0.0f, 1.0f, 1.0f,1.0f };
-		case CUBE_SIDE_220: return (vec3d){ 1.0f, 1.0f,-1.0f,1.0f };
-		case CUBE_SIDE_221: return (vec3d){ 1.0f, 1.0f, 0.0f,1.0f };
-		case CUBE_SIDE_222: return (vec3d){ 1.0f, 1.0f, 1.0f,1.0f };
+		case CUBE_SIDE_000: return (Vec3D){-1.0f,-1.0f,-1.0f,1.0f };
+		case CUBE_SIDE_001: return (Vec3D){-1.0f,-1.0f, 0.0f,1.0f };
+		case CUBE_SIDE_100: return (Vec3D){ 0.0f,-1.0f,-1.0f,1.0f };
+		case CUBE_SIDE_101: return (Vec3D){ 0.0f,-1.0f, 0.0f,1.0f };
+		case CUBE_SIDE_002: return (Vec3D){-1.0f,-1.0f, 1.0f,1.0f };
+		case CUBE_SIDE_102: return (Vec3D){ 0.0f,-1.0f, 1.0f,1.0f };
+		case CUBE_SIDE_200: return (Vec3D){ 1.0f,-1.0f,-1.0f,1.0f };
+		case CUBE_SIDE_201: return (Vec3D){ 1.0f,-1.0f, 0.0f,1.0f };
+		case CUBE_SIDE_202: return (Vec3D){ 1.0f,-1.0f, 1.0f,1.0f };
+		case CUBE_SIDE_010: return (Vec3D){-1.0f, 0.0f,-1.0f,1.0f };
+		case CUBE_SIDE_011: return (Vec3D){-1.0f, 0.0f, 0.0f,1.0f };
+		case CUBE_SIDE_110: return (Vec3D){ 0.0f, 0.0f,-1.0f,1.0f };
+		case CUBE_SIDE_111: return (Vec3D){ 0.0f, 0.0f, 0.0f,1.0f };
+		case CUBE_SIDE_012: return (Vec3D){-1.0f, 0.0f, 1.0f,1.0f };
+		case CUBE_SIDE_112: return (Vec3D){ 0.0f, 0.0f, 1.0f,1.0f };
+		case CUBE_SIDE_210: return (Vec3D){ 1.0f, 0.0f,-1.0f,1.0f };
+		case CUBE_SIDE_211: return (Vec3D){ 1.0f, 0.0f, 0.0f,1.0f };
+		case CUBE_SIDE_212: return (Vec3D){ 1.0f, 0.0f, 1.0f,1.0f };
+		case CUBE_SIDE_020: return (Vec3D){-1.0f, 1.0f,-1.0f,1.0f };
+		case CUBE_SIDE_021: return (Vec3D){-1.0f, 1.0f, 0.0f,1.0f };
+		case CUBE_SIDE_120: return (Vec3D){ 0.0f, 1.0f,-1.0f,1.0f };
+		case CUBE_SIDE_121: return (Vec3D){ 0.0f, 1.0f, 0.0f,1.0f };
+		case CUBE_SIDE_022: return (Vec3D){-1.0f, 1.0f, 1.0f,1.0f };
+		case CUBE_SIDE_122: return (Vec3D){ 0.0f, 1.0f, 1.0f,1.0f };
+		case CUBE_SIDE_220: return (Vec3D){ 1.0f, 1.0f,-1.0f,1.0f };
+		case CUBE_SIDE_221: return (Vec3D){ 1.0f, 1.0f, 0.0f,1.0f };
+		case CUBE_SIDE_222: return (Vec3D){ 1.0f, 1.0f, 1.0f,1.0f };
 	}
-	return (vec3d){ 0.0f,0.0f,0.0f,1.0f };
+	return (Vec3D){ 0.0f,0.0f,0.0f,1.0f };
 }
 
 typedef struct mesh{
 	Vector tris;
 } mesh;
 
-typedef struct mat4x4{
+typedef struct M4x4D{
 	float m[4][4];
-} mat4x4;
+} M4x4D;
 
-mat4x4 Matrix_Null()
+M4x4D Matrix_Null()
 {
-	return (mat4x4){{
+	return (M4x4D){{
 		{ 0.0f,0.0f,0.0f,0.0f },
 		{ 0.0f,0.0f,0.0f,0.0f },
 		{ 0.0f,0.0f,0.0f,0.0f },
 		{ 0.0f,0.0f,0.0f,0.0f }
 	}};
 }
-vec3d Matrix_MultiplyVector(mat4x4 m, vec3d i)
+Vec3D Matrix_MultiplyVector(M4x4D m, Vec3D i)
 {
-	vec3d v;
+	Vec3D v;
 	v.x = i.x * m.m[0][0] + i.y * m.m[1][0] + i.z * m.m[2][0] + i.w * m.m[3][0];
 	v.y = i.x * m.m[0][1] + i.y * m.m[1][1] + i.z * m.m[2][1] + i.w * m.m[3][1];
 	v.z = i.x * m.m[0][2] + i.y * m.m[1][2] + i.z * m.m[2][2] + i.w * m.m[3][2];
 	v.w = i.x * m.m[0][3] + i.y * m.m[1][3] + i.z * m.m[2][3] + i.w * m.m[3][3];
 	return v;
 }
-mat4x4 Matrix_MakeIdentity()
+M4x4D Matrix_MakeIdentity()
 {
-	mat4x4 matrix = Matrix_Null();
+	M4x4D matrix = Matrix_Null();
 	matrix.m[0][0] = 1.0f;
 	matrix.m[1][1] = 1.0f;
 	matrix.m[2][2] = 1.0f;
 	matrix.m[3][3] = 1.0f;
 	return matrix;
 }
-mat4x4 Matrix_MakeRotationX(float fAngleRad)
+M4x4D Matrix_MakeRotationX(float fAngleRad)
 {
-	mat4x4 matrix = Matrix_Null();
+	M4x4D matrix = Matrix_Null();
 	matrix.m[0][0] = 1.0f;
 	matrix.m[1][1] = cosf(fAngleRad);
 	matrix.m[1][2] = sinf(fAngleRad);
@@ -231,9 +231,9 @@ mat4x4 Matrix_MakeRotationX(float fAngleRad)
 	matrix.m[3][3] = 1.0f;
 	return matrix;
 }
-mat4x4 Matrix_MakeRotationY(float fAngleRad)
+M4x4D Matrix_MakeRotationY(float fAngleRad)
 {
-	mat4x4 matrix = Matrix_Null();
+	M4x4D matrix = Matrix_Null();
 	matrix.m[0][0] = cosf(fAngleRad);
 	matrix.m[0][2] = sinf(fAngleRad);
 	matrix.m[2][0] = -sinf(fAngleRad);
@@ -242,9 +242,9 @@ mat4x4 Matrix_MakeRotationY(float fAngleRad)
 	matrix.m[3][3] = 1.0f;
 	return matrix;
 }
-mat4x4 Matrix_MakeRotationZ(float fAngleRad)
+M4x4D Matrix_MakeRotationZ(float fAngleRad)
 {
-	mat4x4 matrix = Matrix_Null();
+	M4x4D matrix = Matrix_Null();
 	matrix.m[0][0] = cosf(fAngleRad);
 	matrix.m[0][1] = sinf(fAngleRad);
 	matrix.m[1][0] = -sinf(fAngleRad);
@@ -253,9 +253,9 @@ mat4x4 Matrix_MakeRotationZ(float fAngleRad)
 	matrix.m[3][3] = 1.0f;
 	return matrix;
 }
-mat4x4 Matrix_MakeTranslation(float x, float y, float z)
+M4x4D Matrix_MakeTranslation(float x, float y, float z)
 {
-	mat4x4 matrix = Matrix_Null();
+	M4x4D matrix = Matrix_Null();
 	matrix.m[0][0] = 1.0f;
 	matrix.m[1][1] = 1.0f;
 	matrix.m[2][2] = 1.0f;
@@ -265,10 +265,10 @@ mat4x4 Matrix_MakeTranslation(float x, float y, float z)
 	matrix.m[3][2] = z;
 	return matrix;
 }
-mat4x4 Matrix_MakeProjection(float fFovDegrees, float fAspectRatio, float fNear, float fFar)
+M4x4D Matrix_MakeProjection(float fFovDegrees, float fAspectRatio, float fNear, float fFar)
 {
 	float fFovRad = 1.0f / tanf(fFovDegrees * 0.5f / 180.0f * 3.14159f);
-	mat4x4 matrix = Matrix_Null();
+	M4x4D matrix = Matrix_Null();
 	matrix.m[0][0] = fAspectRatio * fFovRad;
 	matrix.m[1][1] = fFovRad;
 	matrix.m[2][2] = fFar / (fFar - fNear);
@@ -277,29 +277,29 @@ mat4x4 Matrix_MakeProjection(float fFovDegrees, float fAspectRatio, float fNear,
 	matrix.m[3][3] = 0.0f;
 	return matrix;
 }
-mat4x4 Matrix_MultiplyMatrix(mat4x4 m1, mat4x4 m2)
+M4x4D Matrix_MultiplyMatrix(M4x4D m1, M4x4D m2)
 {
-	mat4x4 matrix = Matrix_Null();
+	M4x4D matrix = Matrix_Null();
 	for (int c = 0; c < 4; c++)
 		for (int r = 0; r < 4; r++)
 			matrix.m[r][c] = m1.m[r][0] * m2.m[0][c] + m1.m[r][1] * m2.m[1][c] + m1.m[r][2] * m2.m[2][c] + m1.m[r][3] * m2.m[3][c];
 	return matrix;
 }
 
-float dist(vec3d plane_p, vec3d plane_n,vec3d p){
-	vec3d n = vec3d_Normalise(p);
-	return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - vec3d_DotProduct(plane_n, plane_p));
+float dist(Vec3D plane_p, Vec3D plane_n,Vec3D p){
+	Vec3D n = Vec3D_Normalise(p);
+	return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - Vec3D_DotProduct(plane_n, plane_p));
 }
 
-int Triangle_ClipAgainstPlane(vec3d plane_p, vec3d plane_n, triangle in_tri, triangle* out_tri1, triangle* out_tri2){
+int Triangle_ClipAgainstPlane(Vec3D plane_p, Vec3D plane_n, Tri3D in_tri, Tri3D* out_tri1, Tri3D* out_tri2){
 	// Make sure plane normal is indeed normal
-	plane_n = vec3d_Normalise(plane_n);
+	plane_n = Vec3D_Normalise(plane_n);
 	
 	// Create two temporary storage arrays to classify points either side of plane
 	// If distance sign is positive, point lies on "inside" of plane
-	vec3d* inCUBE_SIDE_points[3];  int nInsidePointCount = 0;
-	vec3d* outCUBE_SIDE_points[3]; int nOutsidePointCount = 0;
-	// Get signed distance of each point in triangle to plane
+	Vec3D* inCUBE_SIDE_points[3];  int nInsidePointCount = 0;
+	Vec3D* outCUBE_SIDE_points[3]; int nOutsidePointCount = 0;
+	// Get signed distance of each point in Tri3D to plane
 	float d0 = dist(plane_p,plane_n,in_tri.p[0]);
 	float d1 = dist(plane_p,plane_n,in_tri.p[1]);
 	float d2 = dist(plane_p,plane_n,in_tri.p[2]);
@@ -309,81 +309,81 @@ int Triangle_ClipAgainstPlane(vec3d plane_p, vec3d plane_n, triangle in_tri, tri
 	else { outCUBE_SIDE_points[nOutsidePointCount++] = &in_tri.p[1]; }
 	if (d2 >= 0) { inCUBE_SIDE_points[nInsidePointCount++] = &in_tri.p[2]; }
 	else { outCUBE_SIDE_points[nOutsidePointCount++] = &in_tri.p[2]; }
-	// Now classify triangle points, and break the input triangle into 
-	// smaller output triangles if required. There are four possible
+	// Now classify Tri3D points, and break the input Tri3D into 
+	// smaller output Tri3Ds if required. There are four possible
 	// outcomes...
 	if (nInsidePointCount == 0)
 	{
-		// All points lie on the outside of plane, so clip whole triangle
+		// All points lie on the outside of plane, so clip whole Tri3D
 		// It ceases to exist
-		return 0; // No returned triangles are valid
+		return 0; // No returned Tri3Ds are valid
 	}
 	if (nInsidePointCount == 3)
 	{
 		// All points lie on the inside of plane, so do nothing
-		// and allow the triangle to simply pass through
+		// and allow the Tri3D to simply pass through
 		*out_tri1 = in_tri;
-		return 1; // Just the one returned original triangle is valid
+		return 1; // Just the one returned original Tri3D is valid
 	}
 	if (nInsidePointCount == 1 && nOutsidePointCount == 2)
 	{
 		// Triangle should be clipped. As two points lie outside
-		// the plane, the triangle simply becomes a smaller triangle
-		// Copy appearance info to new triangle
+		// the plane, the Tri3D simply becomes a smaller Tri3D
+		// Copy appearance info to new Tri3D
 		out_tri1->c =  in_tri.c;
 		// The inside point is valid, so keep that...
 		out_tri1->p[0] = *inCUBE_SIDE_points[0];
 		// but the two new points are at the locations where the 
-		// original sides of the triangle (lines) intersect with the plane
-		out_tri1->p[1] = vec3d_IntersectPlane(plane_p, &plane_n, *inCUBE_SIDE_points[0], *outCUBE_SIDE_points[0]);
-		out_tri1->p[2] = vec3d_IntersectPlane(plane_p, &plane_n, *inCUBE_SIDE_points[0], *outCUBE_SIDE_points[1]);
-		return 1; // Return the newly formed single triangle
+		// original sides of the Tri3D (lines) intersect with the plane
+		out_tri1->p[1] = Vec3D_IntersectPlane(plane_p, &plane_n, *inCUBE_SIDE_points[0], *outCUBE_SIDE_points[0]);
+		out_tri1->p[2] = Vec3D_IntersectPlane(plane_p, &plane_n, *inCUBE_SIDE_points[0], *outCUBE_SIDE_points[1]);
+		return 1; // Return the newly formed single Tri3D
 	}
 	if (nInsidePointCount == 2 && nOutsidePointCount == 1)
 	{
 		// Triangle should be clipped. As two points lie inside the plane,
-		// the clipped triangle becomes a "quad". Fortunately, we can
-		// represent a quad with two new triangles
-		// Copy appearance info to new triangles
+		// the clipped Tri3D becomes a "quad". Fortunately, we can
+		// represent a quad with two new Tri3Ds
+		// Copy appearance info to new Tri3Ds
 		out_tri1->c =  in_tri.c;
 		out_tri2->c =  in_tri.c;
-		// The first triangle consists of the two inside points and a new
-		// point determined by the location where one side of the triangle
+		// The first Tri3D consists of the two inside points and a new
+		// point determined by the location where one side of the Tri3D
 		// intersects with the plane
 		out_tri1->p[0] = *inCUBE_SIDE_points[0];
 		out_tri1->p[1] = *inCUBE_SIDE_points[1];
-		out_tri1->p[2] = vec3d_IntersectPlane(plane_p, &plane_n, *inCUBE_SIDE_points[0], *outCUBE_SIDE_points[0]);
-		// The second triangle is composed of one of he inside points, a
+		out_tri1->p[2] = Vec3D_IntersectPlane(plane_p, &plane_n, *inCUBE_SIDE_points[0], *outCUBE_SIDE_points[0]);
+		// The second Tri3D is composed of one of he inside points, a
 		// new point determined by the intersection of the other side of the 
-		// triangle and the plane, and the newly created point above
+		// Tri3D and the plane, and the newly created point above
 		out_tri2->p[0] = *inCUBE_SIDE_points[1];
 		out_tri2->p[1] = out_tri1->p[2];
-		out_tri2->p[2] = vec3d_IntersectPlane(plane_p, &plane_n, *inCUBE_SIDE_points[1], *outCUBE_SIDE_points[0]);
-		return 2; // Return two newly formed triangles which form a quad
+		out_tri2->p[2] = Vec3D_IntersectPlane(plane_p, &plane_n, *inCUBE_SIDE_points[1], *outCUBE_SIDE_points[0]);
+		return 2; // Return two newly formed Tri3Ds which form a quad
 	}
 }
 
-mat4x4 Matrix_PointAt(vec3d pos, vec3d target, vec3d up){
+M4x4D Matrix_PointAt(Vec3D pos, Vec3D target, Vec3D up){
 	// Calculate new forward direction
-	vec3d newForward = vec3d_Sub(target, pos);
-	newForward = vec3d_Normalise(newForward);
+	Vec3D newForward = Vec3D_Sub(target, pos);
+	newForward = Vec3D_Normalise(newForward);
 	// Calculate new Up direction
-	vec3d a = vec3d_Mul(newForward, vec3d_DotProduct(up,newForward));
-	vec3d newUp = vec3d_Sub(up, a);
-	newUp = vec3d_Normalise(newUp);
+	Vec3D a = Vec3D_Mul(newForward, Vec3D_DotProduct(up,newForward));
+	Vec3D newUp = Vec3D_Sub(up, a);
+	newUp = Vec3D_Normalise(newUp);
 	// New Right direction is easy, its just cross product
-	vec3d newRight = vec3d_CrossProduct(newUp, newForward);
+	Vec3D newRight = Vec3D_CrossProduct(newUp, newForward);
 	// Construct Dimensioning and Translation Matrix	
-	mat4x4 matrix;
+	M4x4D matrix;
 	matrix.m[0][0] = newRight.x;	matrix.m[0][1] = newRight.y;	matrix.m[0][2] = newRight.z;	matrix.m[0][3] = 0.0f;
 	matrix.m[1][0] = newUp.x;		matrix.m[1][1] = newUp.y;		matrix.m[1][2] = newUp.z;		matrix.m[1][3] = 0.0f;
 	matrix.m[2][0] = newForward.x;	matrix.m[2][1] = newForward.y;	matrix.m[2][2] = newForward.z;	matrix.m[2][3] = 0.0f;
 	matrix.m[3][0] = pos.x;			matrix.m[3][1] = pos.y;			matrix.m[3][2] = pos.z;			matrix.m[3][3] = 1.0f;
 	return matrix;
 }
-mat4x4 Matrix_QuickInverse(mat4x4 m) // Only for Rotation/Translation Matrices
+M4x4D Matrix_QuickInverse(M4x4D m) // Only for Rotation/Translation Matrices
 {
-	mat4x4 matrix;
+	M4x4D matrix;
 	matrix.m[0][0] = m.m[0][0]; matrix.m[0][1] = m.m[1][0]; matrix.m[0][2] = m.m[2][0]; matrix.m[0][3] = 0.0f;
 	matrix.m[1][0] = m.m[0][1]; matrix.m[1][1] = m.m[1][1]; matrix.m[1][2] = m.m[2][1]; matrix.m[1][3] = 0.0f;
 	matrix.m[2][0] = m.m[0][2]; matrix.m[2][1] = m.m[1][2]; matrix.m[2][2] = m.m[2][2]; matrix.m[2][3] = 0.0f;

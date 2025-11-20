@@ -14,24 +14,24 @@
 #include "./World.h"
 
 typedef struct Camera {
-	mat4x4 matProj;
-	vec3d vCamera;
-	vec3d vVelocity;
-	vec3d vLookDir;
+	M4x4D matProj;
+	Vec3D vCamera;
+	Vec3D vVelocity;
+	Vec3D vLookDir;
 	float fYaw;	
 	float fPitch;
-	vec3d vLength;
+	Vec3D vLength;
 } Camera;
 
-Camera Camera_New(vec3d p){
+Camera Camera_New(Vec3D p){
 	Camera c;
 	c.matProj = Matrix_MakeProjection(90.0f,(float)GetHeight() / (float)GetWidth(),0.1f,1000.0f);
 	c.vCamera = p;
-	c.vVelocity = (vec3d){ 0.0f,0.0f,0.0f,1.0f };
-	c.vLookDir = (vec3d){ 0.0f,0.0f,0.0f,1.0f };
+	c.vVelocity = (Vec3D){ 0.0f,0.0f,0.0f,1.0f };
+	c.vLookDir = (Vec3D){ 0.0f,0.0f,0.0f,1.0f };
 	c.fYaw = 0.0f;
 	c.fPitch = 0.0f;
-	c.vLength = (vec3d){ 0.0f,0.0f,0.0f,1.0f };
+	c.vLength = (Vec3D){ 0.0f,0.0f,0.0f,1.0f };
 	return c;
 }
 
@@ -41,10 +41,10 @@ Vector* cubeSidesSelected;
 Vector cubeSides1;
 Vector cubeSides2;
 
-vec3d vCamera = { 10.0f,100.0f,10.0f,1.0f };
-vec3d vLength = { 0.5f,1.8f,0.5f,1.0f };
-vec3d vVelocity = { 0.0f,0.0f,0.0f,1.0f };
-vec3d vLookDir;
+Vec3D vCamera = { 10.0f,100.0f,10.0f,1.0f };
+Vec3D vLength = { 0.5f,1.8f,0.5f,1.0f };
+Vec3D vVelocity = { 0.0f,0.0f,0.0f,1.0f };
+Vec3D vLookDir;
 
 float fYaw;	
 float fPitch;	
@@ -58,9 +58,9 @@ int Mode = 0;
 int Menu = 0;
 
 
-mat4x4 model;
-mat4x4 view;
-mat4x4 proj;
+M4x4D model;
+M4x4D view;
+M4x4D proj;
 
 
 GLuint VBO, VAO;
@@ -71,14 +71,14 @@ char updated;
 Thread worker;
 World map;
 
-vec2d getUVsFromIndex(int tileIndex) {
+Vec2D getUVsFromIndex(int tileIndex) {
     int col = tileIndex % ATLAS_COLS;
     int row = tileIndex / ATLAS_COLS;
 
     float u0 = (float)col * TILE_WIDTH;
     float v0 = (float)row * TILE_HEIGHT;
 
-    return (vec2d){ u0,v0 };
+    return (Vec2D){ u0,v0 };
 }
 void checkCompileErrors(GLuint shader, const char* type) {
     GLint success;
@@ -167,25 +167,25 @@ int Cubes_Compare(const void* e1,const void* e2) {
 	Rect3 r1 = *(Rect3*)e1;
 	Rect3 r2 = *(Rect3*)e2;
 	
-	vec3d pos = vec3d_Add(vCamera,(vec3d){ vLength.x * 0.5f,vLength.y * 0.9f,vLength.z * 0.5f });
-	vec3d d1 = vec3d_Sub(r1.p,pos);
-    vec3d d2 = vec3d_Sub(r2.p,pos);
-	return vec3d_Length(d1) == vec3d_Length(d2) ? 0 : (vec3d_Length(d1) < vec3d_Length(d2) ? 1 : -1);
+	Vec3D pos = Vec3D_Add(vCamera,(Vec3D){ vLength.x * 0.5f,vLength.y * 0.9f,vLength.z * 0.5f });
+	Vec3D d1 = Vec3D_Sub(r1.p,pos);
+    Vec3D d2 = Vec3D_Sub(r2.p,pos);
+	return Vec3D_Length(d1) == Vec3D_Length(d2) ? 0 : (Vec3D_Length(d1) < Vec3D_Length(d2) ? 1 : -1);
 }
 void Cubes_Reload(World* map){
 	Vector_Clear(&Cubes);
 
-	vec3d f = { (int)vCamera.x,(int)vCamera.y,(int)vCamera.z };
+	Vec3D f = { (int)vCamera.x,(int)vCamera.y,(int)vCamera.z };
 	for(int i = -2;i<2;i++){
 		for(int j = -2;j<2;j++){
 			for(int k = -2;k<2;k++){
-				vec3d n = { k,j,i };
-				vec3d r = vec3d_Add(f,n);
+				Vec3D n = { k,j,i };
+				Vec3D r = Vec3D_Add(f,n);
 
 				Block b = World_Get(map,r.x,r.y,r.z);
 
 				if(b!=BLOCK_VOID && b!=BLOCK_ERROR){
-					Vector_Push(&Cubes,(Rect3[]){ { r,(vec3d){ 1.0f,1.0f,1.0f } } });
+					Vector_Push(&Cubes,(Rect3[]){ { r,(Vec3D){ 1.0f,1.0f,1.0f } } });
 				}
 			}
 		}
@@ -194,11 +194,11 @@ void Cubes_Reload(World* map){
 	qsort(Cubes.Memory,Cubes.size,Cubes.ELEMENT_SIZE,Cubes_Compare);
 }
 
-void Stand(vec3d* Data){
+void Stand(Vec3D* Data){
 	Data->y = 0.0f;
 	OnGround = 1;
 }
-void Jump(vec3d* Data){
+void Jump(Vec3D* Data){
 	Data->y = 0.0f;
 }
 
@@ -224,19 +224,19 @@ void Camera_Move(float Time){
 	vVelocity.x = v.x;
 	vVelocity.z = v.y;
 
-	vVelocity = vec3d_Add(vVelocity,vec3d_Mul((vec3d){ 0.0f,-10.0f,0.0f,1.0f },Time));
-	vCamera = vec3d_Add(vCamera,vec3d_Mul(vVelocity,Time));
+	vVelocity = Vec3D_Add(vVelocity,Vec3D_Mul((Vec3D){ 0.0f,-10.0f,0.0f,1.0f },Time));
+	vCamera = Vec3D_Add(vCamera,Vec3D_Mul(vVelocity,Time));
 }
 void Camera_Collision(){
 	Cubes_Reload(&map);
 	OnGround = 0;
 	for(int i = 0;i<Cubes.size;i++){
-		vec3d pos = { -vLength.x * 0.5f,vLength.y * 0.6f,-vLength.z * 0.5f };
+		Vec3D pos = { -vLength.x * 0.5f,vLength.y * 0.6f,-vLength.z * 0.5f };
 
 		Rect3 r1 = *(Rect3*)Vector_Get(&Cubes,i);
-		Rect3 r2 = (Rect3){ vec3d_Sub(vCamera,pos),vLength };
+		Rect3 r2 = (Rect3){ Vec3D_Sub(vCamera,pos),vLength };
 		Rect3_Static(&r2,r1,&vVelocity,(void (*[])(void*)){ NULL,NULL,NULL,NULL,(void*)Jump,(void*)Stand });
-		vCamera = vec3d_Add(r2.p,pos);
+		vCamera = Vec3D_Add(r2.p,pos);
 	}
 }
 
@@ -447,9 +447,9 @@ void Update(AglWindow* w){
 	//if(Stroke(ALX_KEY_R).RELEASED || Stroke(ALX_KEY_F).RELEASED)
 	//	vVelocity.y = 0.0f;
 
-	mat4x4 matCameraRot = Matrix_MakeRotationY(fYaw);
-	vec3d vForward = Matrix_MultiplyVector(matCameraRot,vec3d_new(0.0f,0.0f,1.0f));
-	vec3d vLeft = vec3d_Perp(vForward);
+	M4x4D matCameraRot = Matrix_MakeRotationY(fYaw);
+	Vec3D vForward = Matrix_MultiplyVector(matCameraRot,Vec3D_new(0.0f,0.0f,1.0f));
+	Vec3D vLeft = Vec3D_Perp(vForward);
 	
 	if(Stroke(ALX_KEY_W).DOWN){
 		vVelocity.x += vForward.x * 20.0f * w->w.ElapsedTime;
@@ -475,14 +475,14 @@ void Update(AglWindow* w){
 	if(fPitch<-Border) fPitch = -Border;
 	if(fPitch>Border) fPitch = Border;
 
-	vec3d vUp = vec3d_new( 0.0f,1.0f,0.0f );
-	vec3d vTarget = vec3d_new( 0.0f,0.0f,1.0f );
-	mat4x4 matCameraRotX = Matrix_MakeRotationX(fPitch);
+	Vec3D vUp = Vec3D_new( 0.0f,1.0f,0.0f );
+	Vec3D vTarget = Vec3D_new( 0.0f,0.0f,1.0f );
+	M4x4D matCameraRotX = Matrix_MakeRotationX(fPitch);
 	vLookDir = Matrix_MultiplyVector(matCameraRotX,vTarget);
 	vLookDir = Matrix_MultiplyVector(matCameraRot,vLookDir);
 	
-	vTarget = vec3d_Add(vCamera, vLookDir);
-	mat4x4 matCamera = Matrix_PointAt(vCamera, vTarget, vUp);
+	vTarget = Vec3D_Add(vCamera, vLookDir);
+	M4x4D matCamera = Matrix_PointAt(vCamera, vTarget, vUp);
 	view = Matrix_QuickInverse(matCamera);
 
 	if(Stroke(ALX_MOUSE_L).PRESSED){
@@ -491,19 +491,19 @@ void Update(AglWindow* w){
 		
 		World_Set(&map,c.x,c.y,c.z,BLOCK_VOID);
 		updated = 1;
-		//World_Edit(&map,&meshSelected->tris,(vec3d){ c.x,c.y,c.z },BLOCK_VOID);
+		//World_Edit(&map,&meshSelected->tris,(Vec3D){ c.x,c.y,c.z },BLOCK_VOID);
 	}
 	if(Stroke(ALX_MOUSE_R).PRESSED){
 		Vec3 c = (Vec3){ vCamera.x,vCamera.y + vLength.y * 0.6f,vCamera.z };
 		RayCast_TileMap_N(&map,(void*)World_Void,c,(Vec3){ vLookDir.x,vLookDir.y,vLookDir.z },0.01f,4.0f,&c);
 		
-		vec3d pos = { -vLength.x * 0.5f,vLength.y * 0.6f,-vLength.z * 0.5f };
+		Vec3D pos = { -vLength.x * 0.5f,vLength.y * 0.6f,-vLength.z * 0.5f };
 		Rect3 pr = { { c.x,c.y,c.z },{ 1.0f,1.0f,1.0f } };
-		Rect3 br = { vec3d_Sub(vCamera,pos),vLength };
+		Rect3 br = { Vec3D_Sub(vCamera,pos),vLength };
 		if(!Rect3_Overlap(pr,br)){
 			World_Set(&map,c.x,c.y,c.z,BLOCK_TORCH);
 			updated = 1;
-			//World_Edit(&map,&meshSelected->tris,(vec3d){ c.x,c.y,c.z },BLOCK_TORCH);
+			//World_Edit(&map,&meshSelected->tris,(Vec3D){ c.x,c.y,c.z },BLOCK_TORCH);
 		}
 	}
 	
@@ -534,7 +534,7 @@ void Update(AglWindow* w){
         
 		//printf("CS: %f %f %f, %d / %d\n",cs->pos.x,cs->pos.y,cs->pos.z,cs->id,cs->side);
 
-        mat4x4 mat = Matrix_MultiplyMatrix(
+        M4x4D mat = Matrix_MultiplyMatrix(
             model,
             Matrix_MakeTranslation(cs->pos.x,cs->pos.y,cs->pos.z)
             // Matrix_MultiplyMatrix(
@@ -546,7 +546,7 @@ void Update(AglWindow* w){
             // )
         );
 
-        vec2d atlaspos = getUVsFromIndex(Block_Id(cs->id,cs->side));
+        Vec2D atlaspos = getUVsFromIndex(Block_Id(cs->id,cs->side));
 		//printf("AP: %f %f\n",atlaspos.u,atlaspos.v);
 		
         glUniform2f(glGetUniformLocation(shaderProgram,"shade"),Block_ShadeSide(cs->side),(float)cs->light / (float)LIGHT_MAX);

@@ -7,7 +7,7 @@
 
 
 typedef struct CubeSide {
-    vec3d pos;
+    Vec3D pos;
 	unsigned char light;
     unsigned char id;
     unsigned char side;
@@ -22,12 +22,12 @@ typedef unsigned char Light;
 #define LIGHT_SHADE_Y	0.8f
 #define LIGHT_SHADE_Z	0.6f
 
-Light Light_Step(vec3d p,vec3d n,Light l){
+Light Light_Step(Vec3D p,Vec3D n,Light l){
 	if(l<=LIGHT_MIN) return LIGHT_MIN;
 
 	Light nl = l - LIGHT_STEP;
 	//Light nl = l - I32_max(l / 6,1);
-	//Light nl = l - vec3d_Length(vec3d_Sub(p,n));
+	//Light nl = l - Vec3D_Length(Vec3D_Sub(p,n));
 	if(nl<LIGHT_MIN) 	return LIGHT_MIN;
 	else 				return nl;
 }
@@ -262,13 +262,13 @@ void Chunk_Mesh(Chunk* c,Vector* cubeSides,int x,int z){
 
 				if(b!=BLOCK_VOID){
 					for(int s = 0;s<6;s++){
-						vec3d p = { k,j,i,1.0f };
-						vec3d n = vec3d_Add(p,Neighbour_Side(s));
+						Vec3D p = { k,j,i,1.0f };
+						Vec3D n = Vec3D_Add(p,Neighbour_Side(s));
 						
 						Block nb = Chunk_Get(c,n.x,n.y,n.z);
 						Light nl = Chunk_Get_Light(c,n.x,n.y,n.z);
 						if(nb==BLOCK_VOID || nb==BLOCK_ERROR){
-							vec3d cp = { cx + k,j,cz + i,1.0f };
+							Vec3D cp = { cx + k,j,cz + i,1.0f };
 							Vector_Push(cubeSides,(CubeSide[]){ { .pos = cp,.light = nl,.id = b,.side = s } });
 						}
 					}
@@ -450,11 +450,11 @@ char World_Void(World* map,Vec3 p){
 	return b==BLOCK_VOID || b==BLOCK_ERROR;
 }
 
-void World_Light_Block(World* w,vec3d p){
+void World_Light_Block(World* w,Vec3D p){
 	Light pl = World_Get_Light(w,p.x,p.y,p.z);
 	
 	for(int s = 0;s<6;s++){
-		vec3d n = vec3d_Add(p,Neighbour_Side(s));
+		Vec3D n = Vec3D_Add(p,Neighbour_Side(s));
 		Block nb = World_Get(w,n.x,n.y,n.z);
 
 		if(!Block_Solid(nb)){
@@ -471,7 +471,7 @@ void World_Light_Block(World* w,vec3d p){
     }
 
 	// for(int s = 0;s<27;s++){
-	// 	vec3d n = vec3d_Add(p,Neighbour_AllSide(s));
+	// 	Vec3D n = Vec3D_Add(p,Neighbour_AllSide(s));
 	// 	Light nl = World_Get_Light(w,n.x,n.y,n.z);
 	// 	Light newl = Light_Step(p,n,pl);
 
@@ -506,7 +506,7 @@ void World_Light(World* w){
 				for(int px = 0;px<CHUNK_LX;px++){
 					for(int py = CHUNK_LY - 1;py>=0;py--){
 						Light cl = Chunk_Get_Light(c,px,py,pz);
-						if(cl==LIGHT_MAX) World_Light_Block(w,vec3d_new(cx + px,py,cz + pz));
+						if(cl==LIGHT_MAX) World_Light_Block(w,Vec3D_new(cx + px,py,cz + pz));
 					}
 				}
 			}
@@ -542,12 +542,12 @@ void World_Chunk_Mesh(World* w,Chunk* c,Vector* cubeSides,int x,int z){
 	for(int i = 0;i<CHUNK_LZ;i++){
         for(int j = 0;j<CHUNK_LY;j++){
 			for(int k = 0;k<CHUNK_LX;k++){
-				vec3d p = { cx + k,j,cz + i,1.0f };
+				Vec3D p = { cx + k,j,cz + i,1.0f };
 				Block b = World_Get(w,p.x,p.y,p.z);
 
 				if(b!=BLOCK_VOID){
 					for(int s = 0;s<6;s++){
-						vec3d n = vec3d_Add(p,Neighbour_Side(s));
+						Vec3D n = Vec3D_Add(p,Neighbour_Side(s));
 						
 						Block nb = World_Get(w,n.x,n.y,n.z);
 						Light nl = World_Get_Light(w,n.x,n.y,n.z);
@@ -643,7 +643,7 @@ void World_Generate(World* map){
 		Vector_Push(&map->rows,&r);
     }
 }
-void World_Edit(World* map,Vector* cubeSides,vec3d p,Block b){
+void World_Edit(World* map,Vector* cubeSides,Vec3D p,Block b){
 	World_Set(map,p.x,p.y,p.z,b);
 	World_Mesh(map,cubeSides);
 }
