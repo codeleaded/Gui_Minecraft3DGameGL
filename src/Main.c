@@ -338,7 +338,7 @@ void GL_Init(){
 
     stbi_set_flip_vertically_on_load(1);
     int width,height,n;
-    unsigned char* data = stbi_load("./assets/Old_Atlas.png", &width, &height, &n, 0);
+    unsigned char* data = stbi_load("./assets/Std_Atlas.png", &width, &height, &n, 0);
     if (data) {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, (n==3 ? GL_RGB : GL_RGBA), GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
